@@ -3,6 +3,7 @@ const urlWetherCurrent = `https://api.openweathermap.org/data/2.5/weather?q=Mins
 const urlWetherByDays = `https://api.openweathermap.org/data/2.5/forecast?q=Minsk&appid=${key}`
 
 const widgetContainerElement = document.querySelector('.container')
+
 // WIDGET MAIN ----------------------------------------------------------------------------
 fetch(urlWetherCurrent)
   .then((response) => response.json())
@@ -34,8 +35,6 @@ fetch(urlWetherCurrent)
         month: 'short',
         year: 'numeric',
       })
-
-    console.log(date)
 
     new WidgetCurrent(widgetContainerElement, {
       city,
@@ -96,13 +95,8 @@ class WidgetCurrent {
   // TODO: создать функцию направления ветра
 
   createTemplate() {
-    // TODO:  create variable  this.data.temp
-    const resultTemp =
-      this.data.temp == 0
-        ? '' + this.data.temp
-        : this.data.temp > 0
-        ? '+' + this.data.temp
-        : this.data.temp
+    const temp = this.data.temp
+    const resultTemp = temp == 0 ? '' + temp : temp > 0 ? '+' + temp : temp
 
     return `
     <div class="weather-side">
