@@ -55,34 +55,6 @@ fetch(urlWetherCurrent)
 
 // ---------------------------------------------------------------------------
 
-// let windName
-// switch (true) {
-//   case windDeg > 337 && windDeg <= 22:
-//     windName = 'North'
-//     break
-//   case windDeg > 22 && windDeg <= 67:
-//     windName = 'North-East'
-//     break
-//   case windDeg > 67 && windDeg <= 112:
-//     windName = 'East'
-//     break
-//   case windDeg > 112 && windDeg <= 157:
-//     windName = 'East-South'
-//     break
-//   case windDeg > 157 && windDeg <= 202:
-//     windName = 'South'
-//     break
-//   case windDeg > 202 && windDeg <= 267:
-//     windName = 'South-West'
-//     break
-//   case windDeg > 267 && windDeg <= 292:
-//     windName = 'West'
-//     break
-//   case windDeg > 292 && windDeg <= 337:
-//     windName = 'West-North'
-//     break
-// }
-
 // ---------------------------------------------------------------
 class WidgetCurrent {
   constructor(containerElement, data) {
@@ -92,9 +64,42 @@ class WidgetCurrent {
     this.render()
   }
 
-  // TODO: создать функцию направления ветра
+  windName() {
+    const windDeg = this.data.windDeg
+
+    let windName
+    switch (true) {
+      case windDeg > 337 && windDeg <= 22:
+        windName = 'North'
+        break
+      case windDeg > 22 && windDeg <= 67:
+        windName = 'North-East'
+        break
+      case windDeg > 67 && windDeg <= 112:
+        windName = 'East'
+        break
+      case windDeg > 112 && windDeg <= 157:
+        windName = 'East-South'
+        break
+      case windDeg > 157 && windDeg <= 202:
+        windName = 'South'
+        break
+      case windDeg > 202 && windDeg <= 267:
+        windName = 'South-West'
+        break
+      case windDeg > 267 && windDeg <= 292:
+        windName = 'West'
+        break
+      case windDeg > 292 && windDeg <= 337:
+        windName = 'West-North'
+        break
+    }
+
+    return windName
+  }
 
   createTemplate() {
+    const windName = this.windName()
     const temp = this.data.temp
     const resultTemp = temp == 0 ? '' + temp : temp > 0 ? '+' + temp : temp
 
@@ -126,7 +131,7 @@ class WidgetCurrent {
                 <span class="value">${this.data.humidity} %</span>
             </div>
             <div class="wind">
-                <span class="title">WIND: ${this.data.windName}</span>
+                <span class="title">WIND: ${windName}</span>
                 <span class="value">${this.data.windSpeed} m/s</span>
             </div>
           </div>
