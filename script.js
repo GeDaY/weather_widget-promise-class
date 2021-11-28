@@ -54,8 +54,6 @@ fetch(urlWetherCurrent)
   .catch(() => {})
 
 // ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------
 class WidgetCurrent {
   constructor(containerElement, data) {
     this.containerElement = containerElement
@@ -98,7 +96,7 @@ class WidgetCurrent {
     return windName
   }
 
-  createTemplate() {
+  get template() {
     const windName = this.windName()
     const temp = this.data.temp
     const resultTemp = temp == 0 ? '' + temp : temp > 0 ? '+' + temp : temp
@@ -144,71 +142,66 @@ class WidgetCurrent {
   }
 
   render() {
-    this.containerElement.innerHTML = this.createTemplate()
+    this.containerElement.insertAdjacentHTML('beforeend', this.template)
   }
 }
 
 // WIDGET ITEMS --------------------------------------------------------------------
-// fetch(urlWetherByDays)
-//   .then((response) => response.json())
-//   .then((data) => data.list.filter((item, index) => index % 8 == 4))
-//   .then((data) => createWeatherByDaysItemValue(data))
+fetch(urlWetherByDays)
+  .then((response) => response.json())
+  .then((data) => data.list.filter((item, index) => index % 8 == 4))
+  .then((data) =>
+    data.map((item) => {
+      const [dayName, date, time, iconSrc, temp] = [
+        new Date(item.dt * 1000).toLocaleString('en-us', {
+          weekday: 'short',
+        }),
+        new Date(item.dt * 1000).toLocaleString('en-us', {
+          day: 'numeric',
+        }) +
+          ' ' +
+          new Date(item.dt * 1000).toLocaleString('en-us', {
+            month: 'short',
+          }),
+        (new Date(item.dt * 1000).getHours() < 10 ? '0' : '') +
+          new Date(item.dt * 1000).getHours() +
+          ':' +
+          (new Date(item.dt * 1000).getMinutes() < 10 ? '0' : '') +
+          new Date(item.dt * 1000).getMinutes(),
+        `http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`,
+        Math.round(item.main.temp - 273.15),
+      ]
 
-//   .catch(() => {})
+      new WidgetByDays({ dayName, date, time, iconSrc, temp })
+    })
+  )
+  .catch(() => {})
 
-// // -------------------------------------------------------------------
-// function createWeatherByDaysItemValue(days) {
-//   days.map((item) => {
-//     const [dayName, date, time, iconSrc, temp] = [
-//       new Date(item.dt * 1000).toLocaleString('en-us', {
-//         weekday: 'short',
-//       }),
-//       new Date(item.dt * 1000).toLocaleString('en-us', {
-//         day: 'numeric',
-//       }) +
-//         ' ' +
-//         new Date(item.dt * 1000).toLocaleString('en-us', {
-//           month: 'short',
-//         }),
-//       (new Date(item.dt * 1000).getHours() < 10 ? '0' : '') +
-//         new Date(item.dt * 1000).getHours() +
-//         ':' +
-//         (new Date(item.dt * 1000).getMinutes() < 10 ? '0' : '') +
-//         new Date(item.dt * 1000).getMinutes(),
-//       `http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`,
-//       Math.round(item.main.temp - 273.15),
-//     ]
+// ------------------------------------------------------------------
+class WidgetByDays {
+  constructor(data) {
+    this.data = data
 
-//     new WidgetByDays(dayName, date, time, iconSrc, temp)
-//   })
-// }
+    this.render()
+  }
 
-// // ------------------------------------------------------------------
-// class WidgetByDays {
-//   constructor(dayName, date, time, iconSrc, temp) {
-//     this.dayName = dayName
-//     this.date = date
-//     this.time = time
-//     this.iconSrc = iconSrc
-//     this.temp = temp
-//     this.resultTemp = temp == 0 ? '' + temp : temp > 0 ? '+' + temp : temp
+  get template() {
+    const temp = this.data.temp
+    const resultTemp = temp == 0 ? '' + temp : temp > 0 ? '+' + temp : temp
+    return `
+      <li class="active">
+          <span class="day-name">${this.data.dayName}</span>
+          <span class="month">${this.data.date}</span>
+          <span class="time">${this.data.time}</span>
+          <img class="day-icon" src="${this.data.iconSrc}" alt="weather icon">
+          <span class="day-temp">${resultTemp}&#8451;</span>
+      </li>
+      `
+  }
 
-//     this.render()
-//   }
-
-//   createItemTemplate() {
-//     return `
-//       <li class="active">
-//           <span class="day-name">${this.dayName}</span>
-//           <span class="month">${this.date}</span>
-//           <span class="time">${this.time}</span>
-//           <img class="day-icon" src="${this.iconSrc}" alt="weather icon">
-//           <span class="day-temp">${this.resultTemp}&#8451;</span>
-//       </li>
-//       `
-//   }
-
-//   render() {
-//     document.querySelector('.week-list').innerHTML += this.createItemTemplate()
-//   }
-// }
+  render() {
+    document
+      .querySelector('.week-list')
+      .insertAdjacentHTML('beforeend', this.template)
+  }
+}
